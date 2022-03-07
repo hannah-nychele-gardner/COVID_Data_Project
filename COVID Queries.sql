@@ -1,5 +1,5 @@
 /*
-	Queries used in COVID Deaths based on country visualization
+	Queries used in COVID Deaths based on regions visualization
 	These queries and their corresponding visualizations were completed by following Alex the Analyst's video (https://www.youtube.com/watch?v=QILNlRvJlfQ)
 */
 
