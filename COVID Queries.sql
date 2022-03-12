@@ -1,6 +1,6 @@
 /*
-	Queries used in COVID Deaths based on regions visualization
-	These queries and their corresponding visualizations were completed by following Alex the Analyst's video (https://www.youtube.com/watch?v=QILNlRvJlfQ)
+	Queries used in COVID Deaths based on country visualization
+	This visualization is the one done by following Alex the Analyst's video
 */
 
 --1
@@ -39,43 +39,31 @@ GROUP BY location, population, date
 ORDER BY percent_population_infected DESC
 
 
-
----------- Planned Visualizations ----------
-
-
 /*
-	Queries used in COVID Deaths based on income visualization
+	Queries used in COVID stats based on income level
 */
 
---Total cases, total deaths, and percent of individuals who tested positive and then died (income level)
-SELECT SUM(new_cases) AS total_cases, SUM(CAST(new_deaths AS INT)) AS total_deaths, SUM(CAST(new_deaths AS INT)) / SUM(new_cases) * 100 AS death_percentage
-FROM Portfolio_Project_COVID..CovidDeaths
-WHERE continent IS NULL
-AND location LIKE('%income')
-ORDER BY 1, 2
-
---Total deaths per income level
-SELECT location, SUM(CAST(new_deaths AS INT)) AS total_death_count
+--cases based on population
+SELECT location, AVG(population) population, SUM(new_cases) AS total_cases, (SUM(new_cases) / AVG(population)) * 100 AS infection_rate
 FROM Portfolio_Project_COVID..CovidDeaths
 WHERE continent IS NULL
 AND location LIKE('%income')
 GROUP BY location
-ORDER BY total_death_count DESC
+ORDER BY infection_rate DESC
 
---Highest percent infected per income level
-SELECT location, population, MAX(total_cases) AS highest_infection_count, MAX(total_cases / population) * 100 AS percent_population_infected
+--total cases, total deaths, death percentage
+SELECT location, SUM(new_cases) AS total_cases, SUM(CAST(new_deaths AS INT)) AS total_death_count, SUM(CAST(new_deaths AS INT)) / SUM(new_cases) * 100 AS death_percentage
 FROM Portfolio_Project_COVID..CovidDeaths
 WHERE continent IS NULL
 AND location LIKE('%income')
-GROUP BY location, population
-ORDER BY percent_population_infected DESC
+GROUP BY location
+ORDER BY death_percentage DESC
 
-
-/*
-	Queries used in COVID Vaccinations based on country visualization
-*/
-
-
-/*
-	Queries used in COVID Vaccinations based on income visualization
-*/
+--total vaccinations, percent vaccinated per income level
+SELECT vax.location, AVG(death.population) population, MAX(vax.total_vaccinations) vaccinations, (MAX(vax.total_vaccinations) / AVG(death.population)) * 100 AS percent_vax
+FROM Portfolio_Project_COVID..CovidVaccinations vax JOIN Portfolio_Project_COVID..CovidDeaths death
+ON vax.location = death.location
+WHERE vax.continent IS NULL
+AND vax.location LIKE ('%income')
+GROUP BY vax.location
+ORDER BY percent_vax ASC
